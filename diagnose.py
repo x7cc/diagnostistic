@@ -30,7 +30,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 
-WEBHOOK_URL        = "https://canary.discord.com/api/webhooks/1444045456681210018/W45xarf7B-ao5zlDlTE4XQWBVEu7RjxEguqhLAvRIz0l4Hgi8oZNax4a3CHEPyAnXVzm"
+WEBHOOK_URL        = ""     # discord webhook url
 CLEANUP_AFTER_SEND = True   # delete local files after a successful upload
 VERBOSE            = True   # print progress to terminal
 
