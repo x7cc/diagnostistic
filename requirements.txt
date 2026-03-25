@@ -1,0 +1,2 @@
+# Python >= 3.6 required
+# No external packages needed — stdlib only
