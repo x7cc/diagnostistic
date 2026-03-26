@@ -23,7 +23,7 @@ A lightweight Windows diagnostic tool that collects system information and log f
 
 ```
 diagnose/
-├── github_diagnose.py   # Main collector — runs on the target machine
+├── diagnose.py   # Main collector — runs on the target machine
 ├── requirements.txt     # No external packages needed
 └── rebuild/
     └── rebuilds.py      # Rebuild tool — runs on your machine after receiving chunks
