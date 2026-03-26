@@ -5,6 +5,8 @@
 Collects system information to help diagnose issues and uploads
 the data to a Discord webhook in chunks.
 Then rebuild the information back into a whole using another script.
+Authors:
+    - x7cc https://github.com/x7cc
 """
 
 from __future__ import annotations
